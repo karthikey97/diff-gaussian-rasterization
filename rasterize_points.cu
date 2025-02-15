@@ -114,8 +114,8 @@ RasterizeGaussiansCUDA(
 		out_color.contiguous().data<float>(),
 		accum_factor.contiguous().data<float>(),
 		accum_idx.contiguous().data<int>(),
-		radii.contiguous().data<int>(),
 		accumulate_error,
+		radii.contiguous().data<int>(),
 		debug);
   }
   return std::make_tuple(rendered, out_color, radii, geomBuffer, binningBuffer, imgBuffer);

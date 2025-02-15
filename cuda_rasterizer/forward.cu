@@ -360,7 +360,7 @@ renderCUDA(
 					accum_idx[pix_id * 32] = collected_id[j];
 					// Perform heapify to maintain the 32 largest contributions
 					int start = 0; int left = -1; int right = -1; int largest = -1;
-					int temp_idx = =1; float temp = -1;
+					int temp_idx = 1; float temp = -1;
 					while (start < 31) {
 						left = 2 * start + 1;
 						right = 2 * start + 2;
