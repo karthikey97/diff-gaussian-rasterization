@@ -54,6 +54,7 @@ class _RasterizeGaussians(torch.autograd.Function):
         rotations,
         cov3Ds_precomp,
         raster_settings,
+        do_error_accumulation = False
     ):
 
         # Restructure arguments the way that the C++ lib expects them
@@ -76,6 +77,7 @@ class _RasterizeGaussians(torch.autograd.Function):
             raster_settings.sh_degree,
             raster_settings.campos,
             raster_settings.prefiltered,
+            do_error_accumulation,
             raster_settings.debug
         )
 

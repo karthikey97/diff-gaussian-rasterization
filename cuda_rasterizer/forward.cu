@@ -270,7 +270,9 @@ renderCUDA(
 	float* __restrict__ final_T,
 	uint32_t* __restrict__ n_contrib,
 	const float* __restrict__ bg_color,
-	float* __restrict__ out_color)
+	float* __restrict__ out_color, 
+	float* __restrict__ accum_factor, int* __restrict__ accum_idx,
+	const bool accumulate_error)
 {
 	// Identify current tile and associated min/max pixel range.
 	auto block = cg::this_thread_block();
@@ -350,6 +352,41 @@ renderCUDA(
 				continue;
 			}
 
+			// Storing the 32 largest (alpha*T) in accum_factor and the collected id in accum_idx
+			if (accumulate_error) {
+				float contribution = alpha * T;
+				if (contribution > accum_factor[pix_id * 32]) {
+					accum_factor[pix_id * 32] = contribution;
+					accum_idx[pix_id * 32] = collected_id[j];
+					// Perform heapify to maintain the 32 largest contributions
+					int start = 0; int left = -1; int right = -1; int largest = -1;
+					int temp_idx = =1; float temp = -1;
+					while (start < 31) {
+						left = 2 * start + 1;
+						right = 2 * start + 2;
+						largest = start;
+						if (left < 32 && accum_factor[pix_id * 32 + left] < accum_factor[pix_id * 32 + largest]) {
+							largest = left;
+						}
+						if (right < 32 && accum_factor[pix_id * 32 + right] < accum_factor[pix_id * 32 + largest]) {
+							largest = right;
+						}
+						if (largest != start) {
+							temp = accum_factor[pix_id * 32 + start];
+							accum_factor[pix_id * 32 + start] = accum_factor[pix_id * 32 + largest];
+							accum_factor[pix_id * 32 + largest] = temp;
+							temp_idx = accum_idx[pix_id * 32 + start];
+							accum_idx[pix_id * 32 + start] = accum_idx[pix_id * 32 + largest];
+							accum_idx[pix_id * 32 + largest] = temp_idx;
+							start = largest;
+						}
+						else {
+							break;
+						}
+					}
+				}
+			}
+
 			// Eq. (3) from 3D Gaussian splatting paper.
 			for (int ch = 0; ch < CHANNELS; ch++)
 				C[ch] += features[collected_id[j] * CHANNELS + ch] * alpha * T;
@@ -384,7 +421,10 @@ void FORWARD::render(
 	float* final_T,
 	uint32_t* n_contrib,
 	const float* bg_color,
-	float* out_color)
+	float* out_color, 
+	float* accum_factor,
+	int* accum_idx,
+	const bool accumulate_error)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> > (
 		ranges,
@@ -396,7 +436,10 @@ void FORWARD::render(
 		final_T,
 		n_contrib,
 		bg_color,
-		out_color);
+		out_color,
+		accum_factor,
+		accum_idx,
+		accumulate_error);
 }
 
 void FORWARD::preprocess(int P, int D, int M,

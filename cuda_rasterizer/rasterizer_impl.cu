@@ -216,7 +216,10 @@ int CudaRasterizer::Rasterizer::forward(
 	const float tan_fovx, float tan_fovy,
 	const bool prefiltered,
 	float* out_color,
+	float* accum_factor,
+	int* accum_idx,
 	int* radii,
+	bool accumulate_error,
 	bool debug)
 {
 	const float focal_y = height / (2.0f * tan_fovy);
@@ -330,8 +333,10 @@ int CudaRasterizer::Rasterizer::forward(
 		imgState.accum_alpha,
 		imgState.n_contrib,
 		background,
-		out_color), debug)
-
+		out_color,
+		accum_factor,
+		accum_idx,
+		accumulate_error), debug)
 	return num_rendered;
 }
 
