@@ -53,8 +53,7 @@ class _RasterizeGaussians(torch.autograd.Function):
         scales,
         rotations,
         cov3Ds_precomp,
-        raster_settings,
-        do_error_accumulation = False
+        raster_settings
     ):
 
         # Restructure arguments the way that the C++ lib expects them
@@ -77,7 +76,7 @@ class _RasterizeGaussians(torch.autograd.Function):
             raster_settings.sh_degree,
             raster_settings.campos,
             raster_settings.prefiltered,
-            do_error_accumulation,
+            raster_settings.do_error_accumulation,
             raster_settings.debug
         )
 
@@ -169,6 +168,7 @@ class GaussianRasterizationSettings(NamedTuple):
     campos : torch.Tensor
     prefiltered : bool
     debug : bool
+    do_error_accumulation : bool
 
 class GaussianRasterizer(nn.Module):
     def __init__(self, raster_settings):
