@@ -62,6 +62,7 @@ namespace FORWARD
 		float* out_color,
 		float* accum_factor,
 		int* accum_idx,
+		int* n_comtrib,
 		const bool accumulate_error);
 }
 

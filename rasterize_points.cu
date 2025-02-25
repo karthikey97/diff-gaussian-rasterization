@@ -32,8 +32,8 @@ std::function<char*(size_t N)> resizeFunctional(torch::Tensor& t) {
     return lambda;
 }
 
-// num_rendered, color, accum_factor, accum_idx, radii, geomBuffer, binningBuffer, imgBuffer
-std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
+// num_rendered, color, 	   accum_factor,  accum_idx, 	 n_contrib,     radii, 		   geomBuffer,    binningBuffer, imgBuffer
+std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
 RasterizeGaussiansCUDA(
 	const torch::Tensor& background,
 	const torch::Tensor& means3D,
@@ -69,8 +69,9 @@ RasterizeGaussiansCUDA(
 
   torch::Tensor out_color = torch::full({NUM_CHANNELS, H, W}, 0.0, float_opts);
   torch::Tensor radii = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
-  torch::Tensor accum_factor = torch::full({32, H, W}, -1.0, float_opts);
-  torch::Tensor accum_idx = torch::full({32, H, W}, -1, int_opts);
+  torch::Tensor accum_factor = torch::full({H, W, 32}, -1.0, float_opts);
+  torch::Tensor accum_idx = torch::full({H, W, 32}, -1, int_opts);
+  torch::Tensor n_contrib = torch::full({1, H, W}, 0, int_opts);
   
   torch::Device device(torch::kCUDA);
   torch::TensorOptions options(torch::kByte);
@@ -114,11 +115,16 @@ RasterizeGaussiansCUDA(
 		out_color.contiguous().data<float>(),
 		accum_factor.contiguous().data<float>(),
 		accum_idx.contiguous().data<int>(),
+		n_contrib.contiguous().data<int>(),
 		accumulate_error,
 		radii.contiguous().data<int>(),
 		debug);
   }
+<<<<<<< HEAD
   return std::make_tuple(rendered, out_color, radii, geomBuffer, binningBuffer, imgBuffer);
+=======
+  return std::make_tuple(rendered, out_color, accum_factor, accum_idx, n_contrib, radii, geomBuffer, binningBuffer, imgBuffer);
+>>>>>>> afd0ac8 (working build)
 }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>

@@ -51,6 +51,7 @@ namespace CudaRasterizer
 			float* out_color,
 			float* accum_factor,
 			int* accum_idx,
+			int* n_contrib,
 			bool accumulate_error,
 			int* radii = nullptr,
 			bool debug = false);

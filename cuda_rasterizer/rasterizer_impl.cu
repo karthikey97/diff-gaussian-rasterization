@@ -218,6 +218,7 @@ int CudaRasterizer::Rasterizer::forward(
 	float* out_color,
 	float* accum_factor,
 	int* accum_idx,
+	int* n_contrib,
 	bool accumulate_error,
 	int* radii,
 	bool debug)
@@ -336,7 +337,9 @@ int CudaRasterizer::Rasterizer::forward(
 		out_color,
 		accum_factor,
 		accum_idx,
+		n_contrib,
 		accumulate_error), debug)
+
 	return num_rendered;
 }
 

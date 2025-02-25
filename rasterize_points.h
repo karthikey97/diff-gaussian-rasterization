@@ -15,8 +15,8 @@
 #include <tuple>
 #include <string>
 
-// num_rendered, color, accum_factor, accum_idx, radii, geomBuffer, binningBuffer, imgBuffer
-std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
+// num_rendered, color, 	   accum_factor,  accum_idx, 	 radii, 		geomBuffer,    binningBuffer, imgBuffer, 	 sampleBuffer
+std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
 RasterizeGaussiansCUDA(
 	const torch::Tensor& background,
 	const torch::Tensor& means3D,

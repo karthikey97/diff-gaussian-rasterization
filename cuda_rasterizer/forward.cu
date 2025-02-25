@@ -272,6 +272,7 @@ renderCUDA(
 	const float* __restrict__ bg_color,
 	float* __restrict__ out_color, 
 	float* __restrict__ accum_factor, int* __restrict__ accum_idx,
+	int* __restrict__ n_contrib_global,
 	const bool accumulate_error)
 {
 	// Identify current tile and associated min/max pixel range.
@@ -354,6 +355,7 @@ renderCUDA(
 
 			// Storing the 32 largest (alpha*T) in accum_factor and the collected id in accum_idx
 			if (accumulate_error) {
+				++n_contrib_global[pix_id];
 				float contribution = alpha * T;
 				if (contribution > accum_factor[pix_id * 32]) {
 					accum_factor[pix_id * 32] = contribution;
@@ -361,14 +363,14 @@ renderCUDA(
 					// Perform heapify to maintain the 32 largest contributions
 					int start = 0; int left = -1; int right = -1; int largest = -1;
 					int temp_idx = 1; float temp = -1;
-					while (start < 31) {
+					while (start < 15) {
 						left = 2 * start + 1;
 						right = 2 * start + 2;
 						largest = start;
-						if (left < 32 && accum_factor[pix_id * 32 + left] < accum_factor[pix_id * 32 + largest]) {
+						if (left < 31 && accum_factor[pix_id * 32 + left] < accum_factor[pix_id * 32 + largest]) {
 							largest = left;
 						}
-						if (right < 32 && accum_factor[pix_id * 32 + right] < accum_factor[pix_id * 32 + largest]) {
+						if (right < 31 && accum_factor[pix_id * 32 + right] < accum_factor[pix_id * 32 + largest]) {
 							largest = right;
 						}
 						if (largest != start) {
@@ -424,6 +426,7 @@ void FORWARD::render(
 	float* out_color, 
 	float* accum_factor,
 	int* accum_idx,
+	int* n_contrib_global,
 	const bool accumulate_error)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> > (
@@ -439,6 +442,7 @@ void FORWARD::render(
 		out_color,
 		accum_factor,
 		accum_idx,
+		n_contrib_global,
 		accumulate_error);
 }
 
