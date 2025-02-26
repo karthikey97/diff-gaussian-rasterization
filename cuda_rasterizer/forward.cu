@@ -353,33 +353,33 @@ renderCUDA(
 				continue;
 			}
 
-			// Storing the 32 largest (alpha*T) in accum_factor and the collected id in accum_idx
+			// Storing the #ERROR_BINS largest (alpha*T) in accum_factor and the collected id in accum_idx
 			if (accumulate_error) {
 				++n_contrib_global[pix_id];
 				float contribution = alpha * T;
-				if (contribution > accum_factor[pix_id * 32]) {
-					accum_factor[pix_id * 32] = contribution;
-					accum_idx[pix_id * 32] = collected_id[j];
-					// Perform heapify to maintain the 32 largest contributions
+				if (contribution > accum_factor[pix_id * ERROR_BINS]) {
+					accum_factor[pix_id * ERROR_BINS] = contribution;
+					accum_idx[pix_id * ERROR_BINS] = collected_id[j];
+					// Perform heapify to maintain the ERROR_BINS largest contributions
 					int start = 0; int left = -1; int right = -1; int largest = -1;
 					int temp_idx = 1; float temp = -1;
-					while (start < 15) {
+					while (start < ERROR_BINS/2) {
 						left = 2 * start + 1;
 						right = 2 * start + 2;
 						largest = start;
-						if (left < 31 && accum_factor[pix_id * 32 + left] < accum_factor[pix_id * 32 + largest]) {
+						if (left < ERROR_BINS && accum_factor[pix_id * ERROR_BINS + left] < accum_factor[pix_id * ERROR_BINS + largest]) {
 							largest = left;
 						}
-						if (right < 31 && accum_factor[pix_id * 32 + right] < accum_factor[pix_id * 32 + largest]) {
+						if (right < ERROR_BINS && accum_factor[pix_id * ERROR_BINS + right] < accum_factor[pix_id * ERROR_BINS + largest]) {
 							largest = right;
 						}
 						if (largest != start) {
-							temp = accum_factor[pix_id * 32 + start];
-							accum_factor[pix_id * 32 + start] = accum_factor[pix_id * 32 + largest];
-							accum_factor[pix_id * 32 + largest] = temp;
-							temp_idx = accum_idx[pix_id * 32 + start];
-							accum_idx[pix_id * 32 + start] = accum_idx[pix_id * 32 + largest];
-							accum_idx[pix_id * 32 + largest] = temp_idx;
+							temp = accum_factor[pix_id * ERROR_BINS + start];
+							accum_factor[pix_id * ERROR_BINS + start] = accum_factor[pix_id * ERROR_BINS + largest];
+							accum_factor[pix_id * ERROR_BINS + largest] = temp;
+							temp_idx = accum_idx[pix_id * ERROR_BINS + start];
+							accum_idx[pix_id * ERROR_BINS + start] = accum_idx[pix_id * ERROR_BINS + largest];
+							accum_idx[pix_id * ERROR_BINS + largest] = temp_idx;
 							start = largest;
 						}
 						else {

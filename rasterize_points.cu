@@ -69,9 +69,9 @@ RasterizeGaussiansCUDA(
 
   torch::Tensor out_color = torch::full({NUM_CHANNELS, H, W}, 0.0, float_opts);
   torch::Tensor radii = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
-  torch::Tensor accum_factor = torch::full({H, W, 32}, -1.0, float_opts);
-  torch::Tensor accum_idx = torch::full({H, W, 32}, -1, int_opts);
-  torch::Tensor n_contrib = torch::full({1, H, W}, 0, int_opts);
+  torch::Tensor accum_factor = torch::full({H, W, ERROR_BINS}, -1.0, float_opts);
+  torch::Tensor accum_idx = torch::full({H, W, ERROR_BINS}, -1, int_opts);
+  torch::Tensor n_contrib = torch::full({H, W}, 0, int_opts);
   
   torch::Device device(torch::kCUDA);
   torch::TensorOptions options(torch::kByte);
