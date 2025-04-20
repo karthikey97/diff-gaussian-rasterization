@@ -16,10 +16,6 @@
 #define BLOCK_X 16
 #define BLOCK_Y 16
 
-<<<<<<< HEAD
-#endif
-=======
 #define ERROR_BINS 255
 
 #endif
->>>>>>> 60e9016 (Increased error accumulation heap size to 255)
