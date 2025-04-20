@@ -132,11 +132,7 @@ RasterizeGaussiansCUDA(
 		radii.contiguous().data<int>(),
 		debug);
   }
-<<<<<<< HEAD
-  return std::make_tuple(rendered, out_color, radii, geomBuffer, binningBuffer, imgBuffer);
-=======
   return std::make_tuple(rendered, out_color, accum_factor, accum_idx, n_contrib, radii, geomBuffer, binningBuffer, imgBuffer);
->>>>>>> afd0ac8 (working build)
 }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
